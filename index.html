@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animasi Teks dengan Partikel</title>
+    <style>
+        /* Styling Body */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff758c, #ff7eb3);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            margin: 0;
+        }
+
+        /* Canvas untuk efek partikel */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Kotak utama */
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.3);
+            animation: popIn 1s ease-out;
+        }
+
+        /* Judul */
+        .title {
+            font-size: 3em;
+            font-weight: bold;
+            color: #b30059;
+            opacity: 0;
+            animation: fadeIn 1.5s forwards;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Deskripsi */
+        .description {
+            font-size: 1.6em;
+            color: #444;
+            opacity: 0;
+            animation: fadeIn 2s forwards 1s;
+        }
+
+        /* Tombol */
+        .btn {
+            margin-top: 25px;
+            padding: 15px 30px;
+            font-size: 1.3em;
+            background: linear-gradient(135deg, #ff4081, #ff79a3);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        .btn:hover {
+            transform: scale(1.15);
+            background: linear-gradient(135deg, #e91e63, #ff5370);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Animasi */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Canvas untuk Partikel -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Musik Otomatis -->
+    <audio autoplay>
+        <source src="audio/slow-peacful-piano-music-282236.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- Konten -->
+    <div class="container">
+        <h1 class="title">HELLO</h1>
+        <p class="description">AKU ADA HADIAH BUAT KAMU</p>
+        <a href="love.html" class="btn">Klik Disini</a>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Aktifkan audio saat klik pertama
+        document.addEventListener('click', function() {
+            let audio = document.getElementById('bgMusic');
+            audio.muted = false;
+            audio.play();
+        });
+
+        // Efek Partikel di Background
+        const canvas = document.getElementById("particleCanvas");
+        const ctx = canvas.getContext("2d");
+
+        // Atur ukuran canvas
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Array untuk partikel
+        let particles = [];
+
+        // Fungsi untuk membuat partikel
+        function createParticles() {
+            particles = [];
+            let numParticles = Math.floor(canvas.width * canvas.height / 5000);
+            for (let i = 0; i < numParticles; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 4 + 1,
+                    dx: (Math.random() - 0.5) * 1,
+                    dy: (Math.random() - 0.5) * 1,
+                    opacity: Math.random() * 0.5 + 0.5
+                });
+            }
+        }
+
+        // Gambar partikel di canvas
+        function drawParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            
+            particles.forEach(particle => {
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${particle.opacity})`;
+                ctx.fill();
+                ctx.closePath();
+            });
+        }
+
+        // Update posisi partikel
+        function updateParticles() {
+            particles.forEach(particle => {
+                particle.x += particle.dx;
+                particle.y += particle.dy;
+
+                if (particle.x < 0 || particle.x > canvas.width) particle.dx *= -1;
+                if (particle.y < 0 || particle.y > canvas.height) particle.dy *= -1;
+            });
+        }
+
+        // Loop animasi
+        function animateParticles() {
+            drawParticles();
+            updateParticles();
+            requestAnimationFrame(animateParticles);
+        }
+
+        // Responsif saat layar diubah ukurannya
+        window.addEventListener("resize", () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            createParticles();
+        });
+
+        // Jalankan efek partikel
+        createParticles();
+        animateParticles();
+    </script>
+</body>
+</html>
